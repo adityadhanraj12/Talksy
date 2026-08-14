@@ -1,0 +1,25 @@
+# Dependency directories
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Env variables / Secrets
+.env
+.env.local
+server/.env
+
+# Build folders
+dist/
+client/dist/
+build/
+
+# Logs and system artifacts
+*.log
+npm-debug.log*
+.system_generated/
+
+# OS/Editor configs
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
