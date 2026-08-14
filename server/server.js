@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import path from "path";
+import fs from "fs";
 
 import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
@@ -30,15 +31,14 @@ app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 
-// Server Production serving config
-if (process.env.NODE_ENV === "production") {
+if (process.env.NODE_ENV === "production" && fs.existsSync(path.join(__dirname, "../client/dist"))) {
   app.use(express.static(path.join(__dirname, "../client/dist")));
   app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "../client/dist", "index.html"));
   });
 } else {
-  app.get("/", (req, res) => {
-    res.send("API is running...");
+  app.get("*", (req, res) => {
+    res.send("Talksy Backend API is running...");
   });
 }
 
