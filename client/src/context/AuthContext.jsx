@@ -5,7 +5,7 @@ import { io } from "socket.io-client";
 
 const AuthContext = createContext();
 
-const SOCKET_URL = import.meta.env.MODE === "development" ? "http://localhost:5001" : "/";
+const SOCKET_URL = import.meta.env.MODE === "development" ? "http://localhost:5001" : "https://talksy-oq4x.onrender.com";
 
 export const AuthProvider = ({ children }) => {
   const [authUser, setAuthUser] = useState(null);
