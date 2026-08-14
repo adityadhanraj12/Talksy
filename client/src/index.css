@@ -909,31 +909,17 @@ input:checked + .slider:before {
 
 /* --- Responsive Adaptations --- */
 @media (max-width: 768px) {
-  /* Tablet View: mini sidebar with avatars only, side-by-side with chat */
+  /* Tablet View: Slimmer sidebar, but keep text and names visible */
   .home-container {
-    grid-template-columns: 80px 1fr;
+    grid-template-columns: 260px 1fr;
   }
   
-  .sidebar-title,
-  .sidebar-online-toggle,
-  .sidebar-search,
-  .user-item-status,
-  .user-item-name {
-    display: none;
+  .sidebar-title {
+    font-size: 1rem;
   }
   
-  .user-item {
-    justify-content: center;
-    padding: 8px;
-  }
-  
-  .user-list {
-    padding: 8px 4px;
-  }
-  
-  .avatar-wrapper {
-    width: 40px;
-    height: 40px;
+  .sidebar-online-toggle {
+    font-size: 0.8rem;
   }
   
   .message-wrapper {
