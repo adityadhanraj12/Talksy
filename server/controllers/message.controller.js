@@ -40,11 +40,27 @@ export const sendMessage = async (req, res) => {
     const { id: receiverId } = req.params;
     const senderId = req.user._id;
 
+    // Check block status before sending
+    const receiver = await User.findById(receiverId);
+    const sender = await User.findById(senderId);
+
+    if (!receiver || !sender) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (sender.blockedUsers.includes(receiverId)) {
+      return res.status(400).json({ message: "You have blocked this user" });
+    }
+
+    if (receiver.blockedUsers.includes(senderId)) {
+      return res.status(400).json({ message: "This user has blocked you" });
+    }
+
     const newMessage = new Message({
       senderId,
       receiverId,
       text,
-      image, // stores Base64 string directly
+      image,
     });
 
     await newMessage.save();
@@ -58,6 +74,55 @@ export const sendMessage = async (req, res) => {
     res.status(201).json(newMessage);
   } catch (error) {
     console.log("Error in sendMessage controller: ", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const clearChat = async (req, res) => {
+  try {
+    const { id: userToClearId } = req.params;
+    const myId = req.user._id;
+
+    await Message.deleteMany({
+      $or: [
+        { senderId: myId, receiverId: userToClearId },
+        { senderId: userToClearId, receiverId: myId },
+      ],
+    });
+
+    res.status(200).json({ message: "Chat cleared successfully" });
+  } catch (error) {
+    console.log("Error in clearChat controller: ", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const toggleBlockUser = async (req, res) => {
+  try {
+    const { id: userToBlockId } = req.params;
+    const myId = req.user._id;
+
+    const user = await User.findById(myId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const isBlocked = user.blockedUsers.includes(userToBlockId);
+
+    if (isBlocked) {
+      user.blockedUsers = user.blockedUsers.filter((id) => id.toString() !== userToBlockId);
+    } else {
+      user.blockedUsers.push(userToBlockId);
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      message: isBlocked ? "User unblocked successfully" : "User blocked successfully",
+      blockedUsers: user.blockedUsers,
+    });
+  } catch (error) {
+    console.log("Error in toggleBlockUser controller: ", error.message);
     res.status(500).json({ error: "Internal server error" });
   }
 };

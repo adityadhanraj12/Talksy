@@ -1202,3 +1202,138 @@ input:checked + .slider:before {
   }
 }
 
+/* --- Unread Messages Badge --- */
+.unread-badge {
+  background: var(--success);
+  color: #070913;
+  font-size: 0.72rem;
+  font-weight: 800;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.4);
+  animation: scaleIn 0.2s ease-out;
+}
+
+/* --- Blocked Indicators & Banner States --- */
+.blocked-pill {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 10px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.chat-input-area.blocked-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(239, 68, 68, 0.02);
+  border-top: 1px solid rgba(239, 68, 68, 0.15);
+  padding: 20px 24px;
+  color: #f87171;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* --- Chat Header Menu Dropdown --- */
+.chat-header-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 40px;
+  z-index: 100;
+  min-width: 160px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  animation: slideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  border-radius: var(--radius-md) !important;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+  text-align: left;
+}
+
+.dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.dropdown-item.danger {
+  color: #f87171;
+}
+
+.dropdown-item.danger:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* Animation utilities for the dropdown */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- Redesigned Professional Danger Zone --- */
+.danger-zone {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, rgba(239, 68, 68, 0.01) 100%) !important;
+  border: 1px solid rgba(239, 68, 68, 0.25) !important;
+  box-shadow: 0 4px 20px rgba(239, 68, 68, 0.05);
+  padding: 24px !important;
+  margin-top: 16px !important;
+}
+
+.danger-zone-title {
+  color: #f87171;
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Responsive styling for Danger Zone on Mobile */
+@media (max-width: 600px) {
+  .danger-zone {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    text-align: center !important;
+    gap: 16px !important;
+  }
+  .danger-zone-info {
+    text-align: center !important;
+  }
+  .danger-zone-title {
+    justify-content: center;
+  }
+  .btn-danger {
+    justify-content: center;
+  }
+}
+

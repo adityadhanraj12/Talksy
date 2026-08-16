@@ -12,6 +12,38 @@ export const ChatProvider = ({ children }) => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isUsersLoading, setIsUsersLoading] = useState(false);
   const [isMessagesLoading, setIsMessagesLoading] = useState(false);
+  const [unreadMessages, setUnreadMessages] = useState({});
+
+  // Reset unread count when user selects a conversation
+  useEffect(() => {
+    if (selectedUser?._id) {
+      setUnreadMessages((prev) => ({
+        ...prev,
+        [selectedUser._id]: 0,
+      }));
+    }
+  }, [selectedUser]);
+
+  const playNotificationSound = () => {
+    try {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5 note
+      gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + 0.35);
+    } catch (err) {
+      console.error("Audio playback error:", err);
+    }
+  };
 
   const getUsers = async () => {
     setIsUsersLoading(true);
@@ -48,6 +80,18 @@ export const ChatProvider = ({ children }) => {
     }
   };
 
+  const clearChat = async (userId) => {
+    try {
+      await axiosInstance.delete(`/api/messages/clear/${userId}`);
+      setMessages([]);
+      toast.success("Chat history cleared");
+      return true;
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to clear chat");
+      return false;
+    }
+  };
+
   // Real-time socket message listener
   useEffect(() => {
     if (!socket) return;
@@ -58,6 +102,15 @@ export const ChatProvider = ({ children }) => {
       if (isFromSelectedUser) {
         setMessages((prev) => [...prev, newMessage]);
       } else {
+        // Increment unread count
+        setUnreadMessages((prev) => ({
+          ...prev,
+          [newMessage.senderId]: (prev[newMessage.senderId] || 0) + 1,
+        }));
+        
+        // Play soft synthesized alert sound
+        playNotificationSound();
+
         // Show notification toast for messages from other users
         const sender = users.find(u => u._id === newMessage.senderId);
         if (sender) {
@@ -84,10 +137,13 @@ export const ChatProvider = ({ children }) => {
         selectedUser,
         isUsersLoading,
         isMessagesLoading,
+        unreadMessages,
         getUsers,
         getMessages,
         sendMessage,
+        clearChat,
         setSelectedUser,
+        setUnreadMessages,
       }}
     >
       {children}

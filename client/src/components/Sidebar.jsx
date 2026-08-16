@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext.jsx";
 import { Users, Search } from "lucide-react";
 
 const Sidebar = () => {
-  const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading } = useChat();
+  const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading, unreadMessages } = useChat();
   const { onlineUsers } = useAuth();
   
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
@@ -24,6 +24,9 @@ const Sidebar = () => {
     }
     return matchesSearch;
   });
+
+  // Foolproof online contacts counter matching green dots
+  const onlineContactsCount = users.filter((user) => onlineUsers.includes(user._id)).length;
 
   if (isUsersLoading) {
     return (
@@ -67,7 +70,7 @@ const Sidebar = () => {
               />
               <span className="slider"></span>
             </span>
-            <span>Online ({onlineUsers.length - 1 < 0 ? 0 : onlineUsers.length - 1})</span>
+            <span>Online ({onlineContactsCount})</span>
           </label>
         </div>
 
@@ -94,6 +97,7 @@ const Sidebar = () => {
         ) : (
           filteredUsers.map((user) => {
             const isOnline = onlineUsers.includes(user._id);
+            const unreadCount = unreadMessages[user._id] || 0;
             return (
               <button
                 key={user._id}
@@ -108,9 +112,16 @@ const Sidebar = () => {
                   />
                   {isOnline && <span className="status-indicator"></span>}
                 </div>
-                <div className="user-item-info">
-                  <div className="user-item-name">{user.fullName}</div>
-                  <div className="user-item-status">{isOnline ? "Online" : "Offline"}</div>
+                <div className="user-item-info" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", gap: "8px" }}>
+                  <div style={{ textAlign: "left", minWidth: 0 }}>
+                    <div className="user-item-name" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user.fullName}</div>
+                    <div className="user-item-status">{isOnline ? "Online" : "Offline"}</div>
+                  </div>
+                  {unreadCount > 0 && (
+                    <span className="unread-badge">
+                      {unreadCount}
+                    </span>
+                  )}
                 </div>
               </button>
             );

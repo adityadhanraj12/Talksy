@@ -43,6 +43,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     const newSocket = io(SOCKET_URL, {
+      transports: ["websocket"],
       query: {
         userId: authUser._id,
       },
@@ -144,6 +145,21 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const toggleBlockUser = async (userId) => {
+    try {
+      const res = await axiosInstance.post(`/api/messages/block/${userId}`);
+      setAuthUser((prev) => ({
+        ...prev,
+        blockedUsers: res.data.blockedUsers,
+      }));
+      toast.success(res.data.message);
+      return true;
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to toggle block status");
+      return false;
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -160,6 +176,7 @@ export const AuthProvider = ({ children }) => {
         updateProfile,
         changePassword,
         deleteAccount,
+        toggleBlockUser,
       }}
     >
       {children}

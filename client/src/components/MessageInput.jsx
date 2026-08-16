@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { useChat } from "../context/ChatContext.jsx";
+import { useAuth } from "../context/AuthContext.jsx";
 import { Image, Send, X } from "lucide-react";
 import { compressImage } from "../lib/imageCompressor.js";
 import toast from "react-hot-toast";
@@ -8,7 +9,11 @@ const MessageInput = ({ disabled = false }) => {
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
-  const { sendMessage } = useChat();
+  const { sendMessage, selectedUser } = useChat();
+  const { authUser } = useAuth();
+
+  const hasBlocked = authUser?.blockedUsers?.includes(selectedUser?._id);
+  const isBlockedBy = selectedUser?.blockedUsers?.includes(authUser?._id);
 
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
@@ -50,6 +55,22 @@ const MessageInput = ({ disabled = false }) => {
 
     await sendMessage(data);
   };
+
+  if (hasBlocked) {
+    return (
+      <div className="chat-input-area blocked-state">
+        <span>You have blocked this contact. Unblock to resume chat.</span>
+      </div>
+    );
+  }
+
+  if (isBlockedBy) {
+    return (
+      <div className="chat-input-area blocked-state">
+        <span>This contact has blocked you. You cannot send messages.</span>
+      </div>
+    );
+  }
 
   return (
     <div className="chat-input-area">

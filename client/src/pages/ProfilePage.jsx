@@ -235,7 +235,9 @@ const ProfilePage = () => {
           {/* Danger Zone: Delete Account */}
           <div className="danger-zone">
             <div className="danger-zone-info">
-              <h3 style={{ fontSize: "1rem", color: "var(--error)", fontWeight: "700" }}>Danger Zone</h3>
+              <h3 className="danger-zone-title">
+                <AlertTriangle size={18} /> Danger Zone
+              </h3>
               <p style={{ color: "var(--text-secondary)", fontSize: "0.82rem", marginTop: 4 }}>
                 Permanently delete your account and all message history. This action is irreversible.
               </p>

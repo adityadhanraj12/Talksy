@@ -1,12 +1,42 @@
+import { useState, useRef, useEffect } from "react";
 import { useChat } from "../context/ChatContext.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
-import { X } from "lucide-react";
+import { X, MoreVertical, Trash2, ShieldAlert } from "lucide-react";
 
 const ChatHeader = () => {
-  const { selectedUser, setSelectedUser } = useChat();
-  const { onlineUsers } = useAuth();
+  const { selectedUser, setSelectedUser, clearChat } = useChat();
+  const { onlineUsers, authUser, toggleBlockUser } = useAuth();
+  const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef(null);
   
   const isOnline = onlineUsers.includes(selectedUser._id);
+  const isBlocked = authUser?.blockedUsers?.includes(selectedUser._id);
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setShowMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleClearChat = async () => {
+    if (window.confirm("Are you sure you want to clear your chat history with this contact? This action cannot be undone.")) {
+      await clearChat(selectedUser._id);
+      setShowMenu(false);
+    }
+  };
+
+  const handleToggleBlock = async () => {
+    const action = isBlocked ? "unblock" : "block";
+    if (window.confirm(`Are you sure you want to ${action} this contact?`)) {
+      await toggleBlockUser(selectedUser._id);
+      setShowMenu(false);
+    }
+  };
 
   return (
     <header className="chat-header">
@@ -20,16 +50,40 @@ const ChatHeader = () => {
           {isOnline && <span className="status-indicator"></span>}
         </div>
         <div>
-          <div className="chat-header-name">{selectedUser.fullName}</div>
+          <div className="chat-header-name" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            {selectedUser.fullName}
+            {isBlocked && (
+              <span className="blocked-pill">Blocked</span>
+            )}
+          </div>
           <div className={`chat-header-status ${isOnline ? "online" : ""}`}>
             {isOnline ? "Online" : "Offline"}
           </div>
         </div>
       </div>
 
-      <button onClick={() => setSelectedUser(null)} className="btn-icon" style={{ width: "32px", height: "32px" }}>
-        <X size={16} />
-      </button>
+      <div style={{ display: "flex", gap: "8px", position: "relative" }} ref={menuRef}>
+        <button onClick={() => setShowMenu(!showMenu)} className="btn-icon" style={{ width: "32px", height: "32px" }}>
+          <MoreVertical size={16} />
+        </button>
+
+        {showMenu && (
+          <div className="chat-header-dropdown glass-panel">
+            <button onClick={handleClearChat} className="dropdown-item danger">
+              <Trash2 size={15} />
+              <span>Clear Chat</span>
+            </button>
+            <button onClick={handleToggleBlock} className="dropdown-item">
+              <ShieldAlert size={15} />
+              <span>{isBlocked ? "Unblock User" : "Block User"}</span>
+            </button>
+          </div>
+        )}
+
+        <button onClick={() => setSelectedUser(null)} className="btn-icon" style={{ width: "32px", height: "32px" }}>
+          <X size={16} />
+        </button>
+      </div>
     </header>
   );
 };
