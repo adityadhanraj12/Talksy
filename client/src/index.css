@@ -84,6 +84,27 @@ body {
   box-sizing: border-box;
 }
 
+/* Lock browser window scrolling when on the Chat Dashboard page */
+html:has(.home-container),
+body:has(.home-container),
+.app-container:has(.home-container) {
+  height: 100vh !important;
+  max-height: 100vh !important;
+  overflow: hidden !important;
+}
+
+/* Constrain main content height to the remaining viewport below navbar */
+.main-content:has(.home-container) {
+  height: calc(100vh - 64px) !important;
+  padding: 16px 24px 24px !important;
+  box-sizing: border-box !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden !important;
+  margin-top: 64px;
+}
+
 /* Glassmorphic Panel Base */
 .glass-panel {
   background: var(--glass-bg);
@@ -389,11 +410,12 @@ button {
 .home-container {
   display: grid;
   grid-template-columns: 320px 1fr;
-  height: calc(100vh - 100px); /* exact fit for remaining screen height (80px + 20px = 100px!) */
+  height: 100%; /* Fill container height */
   width: 100%;
   max-width: 1200px;
   margin: auto;
   animation: fadeIn 0.4s ease-out;
+  overflow: hidden;
 }
 
 /* --- Sidebar --- */
@@ -1122,7 +1144,12 @@ input:checked + .slider:before {
   /* Mobile Phone View: Full list or full chat view (never side-by-side) */
   .home-container {
     grid-template-columns: 1fr;
-    height: calc(100vh - 80px);
+    height: 100%;
+  }
+
+  .main-content:has(.home-container) {
+    padding: 8px !important;
+    height: calc(100vh - 64px) !important;
   }
 
   /* Restore text and search elements in full sidebar view on mobile */
