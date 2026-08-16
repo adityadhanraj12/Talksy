@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useChat } from "../context/ChatContext.jsx";
 import Sidebar from "../components/Sidebar.jsx";
 import ChatContainer from "../components/ChatContainer.jsx";
@@ -6,8 +7,20 @@ import { MessageSquare } from "lucide-react";
 const HomePage = () => {
   const { selectedUser } = useChat();
 
+  useEffect(() => {
+    // Add active class to body to lock viewport scrolling on Chat page
+    document.body.classList.add("chat-page-active");
+    document.documentElement.classList.add("chat-page-active");
+
+    return () => {
+      // Remove class on unmount
+      document.body.classList.remove("chat-page-active");
+      document.documentElement.classList.remove("chat-page-active");
+    };
+  }, []);
+
   return (
-    <div className="main-content">
+    <div className="main-content chat-page">
       <div className={`home-container glass-panel ${selectedUser ? "chat-active" : "list-active"}`}>
         <Sidebar />
         
