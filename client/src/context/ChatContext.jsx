@@ -45,6 +45,24 @@ export const ChatProvider = ({ children }) => {
     }
   };
 
+  const updateLastMessageTime = (userId, time = new Date()) => {
+    setUsers((prevUsers) => {
+      const updated = prevUsers.map((u) => {
+        if (u._id === userId) {
+          return { ...u, lastMessageTime: time };
+        }
+        return u;
+      });
+      // Re-sort: latest message time first, then alphabetically
+      return [...updated].sort((a, b) => {
+        const t1 = a.lastMessageTime ? new Date(a.lastMessageTime).getTime() : 0;
+        const t2 = b.lastMessageTime ? new Date(b.lastMessageTime).getTime() : 0;
+        if (t1 !== t2) return t2 - t1;
+        return a.fullName.localeCompare(b.fullName);
+      });
+    });
+  };
+
   const getUsers = async () => {
     setIsUsersLoading(true);
     try {
@@ -73,6 +91,8 @@ export const ChatProvider = ({ children }) => {
     try {
       const res = await axiosInstance.post(`/api/messages/send/${selectedUser._id}`, messageData);
       setMessages((prev) => [...prev, res.data]);
+      // Update last message time on frontend to sort selected user to top
+      updateLastMessageTime(selectedUser._id, res.data.createdAt);
       return res.data;
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to send message");
@@ -101,6 +121,8 @@ export const ChatProvider = ({ children }) => {
       const isFromSelectedUser = newMessage.senderId === selectedUser?._id;
       if (isFromSelectedUser) {
         setMessages((prev) => [...prev, newMessage]);
+        // Update last message time for selected user
+        updateLastMessageTime(selectedUser._id, newMessage.createdAt);
       } else {
         // Increment unread count
         setUnreadMessages((prev) => ({
@@ -110,6 +132,9 @@ export const ChatProvider = ({ children }) => {
         
         // Play soft synthesized alert sound
         playNotificationSound();
+
+        // Update last message time for sender so they bubble up!
+        updateLastMessageTime(newMessage.senderId, newMessage.createdAt);
 
         // Show notification toast for messages from other users
         const sender = users.find(u => u._id === newMessage.senderId);

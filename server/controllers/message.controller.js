@@ -1,14 +1,65 @@
+import mongoose from "mongoose";
 import User from "../models/User.js";
 import Message from "../models/Message.js";
 import { getReceiverSocketId, io } from "../lib/socket.js";
 
 export const getUsersForSidebar = async (req, res) => {
   try {
-    const loggedInUserId = req.user._id;
-    // Find all users except the logged in user
-    const filteredUsers = await User.find({ _id: { $ne: loggedInUserId } }).select("-password");
+    const loggedInUserId = new mongoose.Types.ObjectId(req.user._id);
 
-    res.status(200).json(filteredUsers);
+    const users = await User.aggregate([
+      // Exclude the logged-in user
+      { $match: { _id: { $ne: loggedInUserId } } },
+      // Lookup the last message between loggedInUser and this contact
+      {
+        $lookup: {
+          from: "messages",
+          let: { userId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $or: [
+                    {
+                      $and: [
+                        { $eq: ["$senderId", loggedInUserId] },
+                        { $eq: ["$receiverId", "$$userId"] },
+                      ],
+                    },
+                    {
+                      $and: [
+                        { $eq: ["$senderId", "$$userId"] },
+                        { $eq: ["$receiverId", loggedInUserId] },
+                      ],
+                    },
+                  ],
+                },
+              },
+            },
+            { $sort: { createdAt: -1 } },
+            { $limit: 1 },
+          ],
+          as: "lastMessage",
+        },
+      },
+      // Extract the last message's createdAt time
+      {
+        $addFields: {
+          lastMessageTime: { $arrayElemAt: ["$lastMessage.createdAt", 0] },
+        },
+      },
+      // Sort: users with recent chats first, then alphabetically by name
+      { $sort: { lastMessageTime: -1, fullName: 1 } },
+      // Project out the password and the lookup array
+      {
+        $project: {
+          password: 0,
+          lastMessage: 0,
+        },
+      },
+    ]);
+
+    res.status(200).json(users);
   } catch (error) {
     console.error("Error in getUsersForSidebar: ", error.message);
     res.status(500).json({ error: "Internal server error" });
