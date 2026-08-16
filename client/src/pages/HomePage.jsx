@@ -12,10 +12,23 @@ const HomePage = () => {
     document.body.classList.add("chat-page-active");
     document.documentElement.classList.add("chat-page-active");
 
+    // Brute-force scroll snapping to (0, 0) to prevent browser window scrolling
+    const lockScroll = () => {
+      if (window.scrollY !== 0 || window.scrollX !== 0) {
+        window.scrollTo(0, 0);
+      }
+    };
+
+    window.addEventListener("scroll", lockScroll, { passive: true });
+    
+    // Initial snap
+    window.scrollTo(0, 0);
+
     return () => {
-      // Remove class on unmount
+      // Remove class and event listener on unmount
       document.body.classList.remove("chat-page-active");
       document.documentElement.classList.remove("chat-page-active");
+      window.removeEventListener("scroll", lockScroll);
     };
   }, []);
 

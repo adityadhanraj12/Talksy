@@ -8,7 +8,7 @@ import { Loader } from "lucide-react";
 const ChatContainer = () => {
   const { messages, getMessages, isMessagesLoading, selectedUser } = useChat();
   const { authUser } = useAuth();
-  const messageEndRef = useRef(null);
+  const messagesBoxRef = useRef(null);
 
   useEffect(() => {
     if (selectedUser?._id) {
@@ -17,8 +17,8 @@ const ChatContainer = () => {
   }, [selectedUser?._id]);
 
   useEffect(() => {
-    if (messageEndRef.current && messages) {
-      messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+    if (messagesBoxRef.current && messages) {
+      messagesBoxRef.current.scrollTop = messagesBoxRef.current.scrollHeight;
     }
   }, [messages]);
 
@@ -54,7 +54,7 @@ const ChatContainer = () => {
     <div className="chat-container">
       <ChatHeader />
 
-      <div className="messages-box">
+      <div className="messages-box" ref={messagesBoxRef}>
         {messages.length === 0 ? (
           <div style={{ margin: "auto", textAlign: "center", color: "var(--text-muted)", fontSize: "0.9rem" }}>
             Say hello to {selectedUser.fullName}! 👋
@@ -83,7 +83,6 @@ const ChatContainer = () => {
             );
           })
         )}
-        <div ref={messageEndRef} />
       </div>
 
       <MessageInput />
