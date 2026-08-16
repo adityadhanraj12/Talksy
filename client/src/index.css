@@ -77,10 +77,11 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 80px 24px 24px; /* Space for navbar */
+  padding: 80px 24px 20px; /* Space for navbar, reduced bottom padding */
   max-width: 1440px;
   width: 100%;
   margin: 0 auto;
+  box-sizing: border-box;
 }
 
 /* Glassmorphic Panel Base */
@@ -287,6 +288,36 @@ button {
   transition: var(--transition);
 }
 
+.nav-profile-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px 6px 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  border-radius: 30px;
+  transition: var(--transition);
+}
+
+.nav-profile-wrapper:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(56, 189, 248, 0.2);
+}
+
+.nav-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid var(--accent-primary);
+}
+
+.nav-username {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
 .nav-item:hover, .nav-item.active {
   color: var(--text-primary);
   background: rgba(255, 255, 255, 0.05);
@@ -358,7 +389,7 @@ button {
 .home-container {
   display: grid;
   grid-template-columns: 320px 1fr;
-  height: calc(100vh - 88px); /* Height minus header + margin */
+  height: calc(100vh - 100px); /* exact fit for remaining screen height (80px + 20px = 100px!) */
   width: 100%;
   max-width: 1200px;
   margin: auto;
