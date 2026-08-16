@@ -111,9 +111,3 @@ npm install
 npm run dev
 ```
 Open `http://localhost:5173` in your browser to experience the application locally!
-
----
-
-## 🛡️ License
-
-This project is licensed under the MIT License.
