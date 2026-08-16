@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext.jsx";
 import { Camera, User, Mail, Loader, KeyRound, Trash2, AlertTriangle, X, Lock } from "lucide-react";
+import { compressImage } from "../lib/imageCompressor.js";
 import toast from "react-hot-toast";
 
 const ProfilePage = () => {
@@ -25,19 +26,20 @@ const ProfilePage = () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Image is too large. Please select an image under 5MB.");
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
       return;
     }
 
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-
-    reader.onload = async () => {
-      const base64Image = reader.result;
-      setSelectedImg(base64Image);
-      await updateProfile({ profilePic: base64Image });
-    };
+    try {
+      // Compress profile image to 300x300 (ideal size) and 70% quality
+      const compressedBase64 = await compressImage(file, 300, 300, 0.7);
+      setSelectedImg(compressedBase64);
+      await updateProfile({ profilePic: compressedBase64 });
+    } catch (error) {
+      toast.error("Failed to process profile image");
+      console.error(error);
+    }
   };
 
   const handleNameUpdate = async (e) => {

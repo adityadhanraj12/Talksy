@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { useChat } from "../context/ChatContext.jsx";
 import { Image, Send, X } from "lucide-react";
+import { compressImage } from "../lib/imageCompressor.js";
 import toast from "react-hot-toast";
 
 const MessageInput = ({ disabled = false }) => {
@@ -9,7 +10,7 @@ const MessageInput = ({ disabled = false }) => {
   const fileInputRef = useRef(null);
   const { sendMessage } = useChat();
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
@@ -18,16 +19,14 @@ const MessageInput = ({ disabled = false }) => {
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Image must be smaller than 5MB");
-      return;
+    try {
+      // Compress the image before uploading (800x800, 70% quality)
+      const compressedBase64 = await compressImage(file, 800, 800, 0.7);
+      setImagePreview(compressedBase64);
+    } catch (error) {
+      toast.error("Failed to process image");
+      console.error(error);
     }
-
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => {
-      setImagePreview(reader.result);
-    };
   };
 
   const removeImage = () => {
