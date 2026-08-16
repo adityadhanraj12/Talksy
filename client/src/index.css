@@ -776,22 +776,44 @@ input:checked + .slider:before {
 }
 
 /* --- Profile Page --- */
-.profile-card {
+.profile-container {
+  display: flex;
+  gap: 24px;
+  max-width: 1000px;
   width: 100%;
-  max-width: 500px;
   margin: auto;
-  padding: 40px;
+  align-items: stretch;
+}
+
+.profile-card {
+  width: 360px;
+  flex-shrink: 0;
+  padding: 32px;
   border-radius: var(--radius-lg);
   text-align: center;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-  animation: fadeIn 0.4s ease-out;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+}
+
+.profile-settings-card {
+  flex: 1;
+  padding: 32px;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  display: flex;
+  flex-direction: column;
 }
 
 .profile-avatar-container {
   position: relative;
   width: 120px;
   height: 120px;
-  margin: 0 auto 24px;
+  margin: 0 auto 16px;
 }
 
 .profile-avatar-img {
@@ -850,11 +872,149 @@ input:checked + .slider:before {
 .profile-meta-row {
   display: flex;
   justify-content: space-between;
-  margin-top: 24px;
-  padding-top: 16px;
+  margin-top: 16px;
+  padding-top: 12px;
   border-top: 1px solid var(--glass-border);
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   color: var(--text-secondary);
+}
+
+.profile-settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Danger Zone */
+.danger-zone {
+  background: rgba(239, 68, 68, 0.04);
+  border: 1px solid rgba(239, 68, 68, 0.15);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 8px;
+}
+
+.danger-zone-info {
+  flex: 1;
+  text-align: left;
+}
+
+.btn-danger {
+  background: transparent;
+  color: var(--error);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.88rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: var(--transition);
+}
+
+.btn-danger:hover {
+  background: var(--error);
+  color: white;
+  border-color: var(--error);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.35);
+}
+
+/* Modal Styling */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-content {
+  max-width: 480px;
+  width: 100%;
+  background: var(--bg-secondary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  text-align: left;
+}
+
+.modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-title-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.modal-body {
+  padding: 20px 24px 12px;
+}
+
+.modal-footer {
+  padding: 16px 24px;
+  background: rgba(0, 0, 0, 0.25);
+  border-top: 1px solid var(--glass-border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.btn-danger-confirm {
+  background: var(--error);
+  color: white;
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: var(--transition);
+}
+
+.btn-danger-confirm:hover:not(:disabled) {
+  filter: brightness(1.1);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+}
+
+.btn-danger-confirm:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Update general responsive queries */
+@media (max-width: 850px) {
+  .profile-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+  .profile-card {
+    width: 100%;
+    max-width: 500px;
+  }
+  .profile-settings-card {
+    width: 100%;
+    max-width: 500px;
+  }
 }
 
 /* --- Skeleton Loading States --- */

@@ -6,10 +6,12 @@ import toast from "react-hot-toast";
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
     password: "",
+    confirmPassword: "",
   });
 
   const { signup, isSigningUp } = useAuth();
@@ -20,6 +22,7 @@ const SignUpPage = () => {
     if (!/\S+@\S+\.\S+/.test(formData.email)) return toast.error("Invalid email format");
     if (!formData.password) return toast.error("Password is required");
     if (formData.password.length < 6) return toast.error("Password must be at least 6 characters");
+    if (formData.password !== formData.confirmPassword) return toast.error("Passwords do not match");
 
     return true;
   };
@@ -56,7 +59,7 @@ const SignUpPage = () => {
                 id="fullName"
                 type="text"
                 className="input-field"
-                placeholder="John Doe"
+                placeholder="Aditya Dhanraj"
                 value={formData.fullName}
                 onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
               />
@@ -100,6 +103,30 @@ const SignUpPage = () => {
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
+          </div>
+
+          <div className="input-group">
+            <label htmlFor="confirmPassword">Confirm Password</label>
+            <div className="input-with-icon">
+              <span className="input-icon">
+                <Lock size={20} />
+              </span>
+              <input
+                id="confirmPassword"
+                type={showConfirmPassword ? "text" : "password"}
+                className="input-field"
+                placeholder="••••••••"
+                value={formData.confirmPassword}
+                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
           </div>

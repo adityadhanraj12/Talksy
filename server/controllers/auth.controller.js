@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import User from "../models/User.js";
+import Message from "../models/Message.js";
 import { generateToken } from "../lib/utils.js";
 
 export const signup = async (req, res) => {
@@ -36,6 +37,7 @@ export const signup = async (req, res) => {
         fullName: newUser.fullName,
         email: newUser.email,
         profilePic: newUser.profilePic,
+        createdAt: newUser.createdAt,
       });
     } else {
       res.status(400).json({ message: "Invalid user data" });
@@ -71,6 +73,7 @@ export const login = async (req, res) => {
       fullName: user.fullName,
       email: user.email,
       profilePic: user.profilePic,
+      createdAt: user.createdAt,
     });
   } catch (error) {
     console.log("Error in login controller", error.message);
@@ -95,24 +98,88 @@ export const logout = (req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
-    const { profilePic } = req.body;
+    const { fullName, profilePic } = req.body;
     const userId = req.user._id;
 
-    if (!profilePic) {
-      return res.status(400).json({ message: "Profile pic is required" });
+    if (!fullName && !profilePic) {
+      return res.status(400).json({ message: "Nothing to update" });
     }
 
-    // We store the base64 string directly into MongoDB user object
+    const updateData = {};
+    if (fullName !== undefined) updateData.fullName = fullName;
+    if (profilePic !== undefined) updateData.profilePic = profilePic;
+
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      { profilePic },
+      updateData,
       { new: true }
-    );
+    ).select("-password");
 
     res.status(200).json(updatedUser);
   } catch (error) {
     console.log("error in update profile:", error);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const changePassword = async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  const userId = req.user._id;
+
+  try {
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: "New password must be at least 6 characters" });
+    }
+
+    const user = await User.findById(userId);
+    const isPasswordCorrect = await bcrypt.compare(currentPassword, user.password);
+
+    if (!isPasswordCorrect) {
+      return res.status(400).json({ message: "Incorrect current password" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+    await user.save();
+
+    res.status(200).json({ message: "Password updated successfully" });
+  } catch (error) {
+    console.log("Error in changePassword controller:", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const deleteAccount = async (req, res) => {
+  const userId = req.user._id;
+
+  try {
+    // Delete user
+    await User.findByIdAndDelete(userId);
+
+    // Delete all messages associated with the user
+    await Message.deleteMany({
+      $or: [
+        { senderId: userId },
+        { receiverId: userId }
+      ]
+    });
+
+    // Clear session cookies
+    res.cookie("jwt", "", {
+      maxAge: 0,
+      httpOnly: true,
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: process.env.NODE_ENV === "production",
+    });
+
+    res.status(200).json({ message: "Account deleted successfully" });
+  } catch (error) {
+    console.log("Error in deleteAccount controller:", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 

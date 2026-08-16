@@ -117,6 +117,33 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const changePassword = async (currentPassword, newPassword) => {
+    try {
+      const res = await axiosInstance.put("/api/auth/change-password", { currentPassword, newPassword });
+      toast.success(res.data.message || "Password changed successfully!");
+      return true;
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to change password");
+      return false;
+    }
+  };
+
+  const deleteAccount = async () => {
+    try {
+      await axiosInstance.delete("/api/auth/delete-account");
+      setAuthUser(null);
+      if (socket) {
+        socket.disconnect();
+        setSocket(null);
+      }
+      toast.success("Account deleted successfully!");
+      return true;
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to delete account");
+      return false;
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -131,6 +158,8 @@ export const AuthProvider = ({ children }) => {
         login,
         logout,
         updateProfile,
+        changePassword,
+        deleteAccount,
       }}
     >
       {children}
