@@ -99,7 +99,7 @@ body.chat-page-active .main-content {
   padding: 16px 24px 20px !important;
   box-sizing: border-box !important;
   display: flex;
-  align-items: center;
+  align-items: stretch !important;
   justify-content: center;
   overflow: hidden !important;
   margin-top: 64px;
