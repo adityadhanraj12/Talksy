@@ -1122,8 +1122,8 @@ input:checked + .slider:before {
 }
 
 /* --- Responsive Adaptations --- */
-@media (max-width: 768px) {
-  /* Tablet View: Slimmer sidebar, but keep text and names visible */
+@media (min-width: 769px) and (max-width: 1024px) {
+  /* Tablet View: Slimmer sidebar, side-by-side view */
   .home-container {
     grid-template-columns: 260px 1fr;
     grid-template-rows: 100%;
@@ -1142,8 +1142,8 @@ input:checked + .slider:before {
   }
 }
 
-@media (max-width: 600px) {
-  /* Mobile Phone View: Full list or full chat view (never side-by-side) */
+@media (max-width: 768px) {
+  /* Mobile Phone & Portrait Tablet View: Full list or full chat view (never side-by-side) */
   .home-container {
     grid-template-columns: 1fr;
     grid-template-rows: 100%;
